@@ -23,34 +23,40 @@ export default class User extends Component {
   state = {
     stars: [],
     loading: false,
+    page: 1,
   };
 
   async componentDidMount() {
+    this.load();
+  }
+
+  load = async (page = 1) => {
+    const { stars } = this.state;
     const { route } = this.props;
 
-    this.setState({ loading: true });
+    const response = await api.get(
+      `/users/${route.params.user.login}/starred`,
+      {
+        params: {
+          page,
+        },
+      }
+    );
 
-    const response = await api.get(`/users/${route.params.user.login}/starred`);
-
-    this.setState({ stars: response.data, loading: false });
-  }
-  /**
-   *const { name } = route.params;
-  function navigateToMain() {
-    navigation.navigate('Main');
-  }
-
-  function navigateToDetails() {
-    navigation.navigate('Details', {
-      address: 'R Monte Alegre',
-      status: 'devedor',
+    this.setState({
+      stars: page >= 2 ? [...stars, ...response.data] : response.data,
+      page,
+      loading: false,
     });
-  }
+  };
 
-   function updateOptions() {
-    navigation.setOptions({ title: `${name} Updated!` });
-  }
-   */
+  loadMore = () => {
+    const { page } = this.state;
+
+    const nextPage = page + 1;
+
+    this.load(nextPage);
+  };
 
   render() {
     const { route } = this.props;
@@ -70,6 +76,8 @@ export default class User extends Component {
           <ActivityIndicator color="#7159c1" />
         ) : (
           <Stars
+            onEndReachedThreshold={0.2} // Carrega mais itens quando chegar em 20% do fim
+            onEndReached={this.loadMore} // Função que carrega mais itens
             data={stars}
             keyExtractor={star => String(star.id)}
             renderItem={({ item }) => (

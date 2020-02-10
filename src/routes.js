@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import Main from './pages/Main';
@@ -22,26 +21,18 @@ export default function Routes() {
         },
       }}
     >
-      <Stack.Screen name="Main" component={Main} options={{ title: 'Home' }} />
+      <Stack.Screen
+        name="Main"
+        component={Main}
+        options={{ title: 'GithubPlay' }}
+      />
       <Stack.Screen
         name="User"
-        options={{ title: 'Usuários' }}
+        options={({ route }) => ({ title: route.params.user.name })}
         // options={({ route }) => ({ title: route.params.name })}
         component={User}
       />
-      <Stack.Screen
-        name="Details"
-        component={Details}
-        options={{
-          headerRight: () => (
-            <Button
-              onPress={() => alert('This is a button!')}
-              title="Info"
-              color="#fff"
-            />
-          ),
-        }}
-      />
+      <Stack.Screen name="Details" component={Details} />
     </Stack.Navigator>
   );
 }

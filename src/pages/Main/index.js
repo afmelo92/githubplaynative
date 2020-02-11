@@ -27,14 +27,18 @@ export default class Main extends Component {
     newUser: '',
     users: [],
     loading: false,
+    refreshing: false,
   };
 
   async componentDidMount() {
-    const users = await AsyncStorage.getItem('users');
+    this.load();
+    /**
+     * const users = await AsyncStorage.getItem('users');
 
     if (users) {
-      this.setState({ users: JSON.parse(users) });
+      this.setState({ users: JSON.parse(users), refreshing: false });
     }
+     */
   }
 
   componentDidUpdate(_, prevState) {
@@ -45,32 +49,55 @@ export default class Main extends Component {
     }
   }
 
+  load = async () => {
+    const users = await AsyncStorage.getItem('users');
+
+    if (users) {
+      this.setState({ users: JSON.parse(users), refreshing: false });
+    }
+  };
+
   handleAddUser = async () => {
     const { users, newUser } = this.state;
-
     this.setState({ loading: true });
 
-    const response = await api.get(`/users/${newUser}`);
+    try {
+      const response = await api.get(`/users/${newUser}`);
 
-    const data = {
-      name: response.data.name,
-      login: response.data.login,
-      bio: response.data.bio,
-      avatar: response.data.avatar_url,
-    };
+      const data = {
+        name: response.data.name,
+        login: response.data.login,
+        bio: response.data.bio,
+        avatar: response.data.avatar_url,
+      };
 
-    this.setState({
-      users: [...users, data],
-      newUser: '',
-      loading: false,
-    });
+      this.setState({
+        users: [...users, data],
+        newUser: '',
+        loading: false,
+        refreshing: false,
+      });
 
-    Keyboard.dismiss();
+      Keyboard.dismiss();
+    } catch (err) {
+      this.setState({
+        users: [...users],
+        newUser: '',
+        loading: false,
+        refreshing: false,
+      });
+    }
+
+    return this;
   };
 
   handleNavigate = user => {
     const { navigation } = this.props;
     navigation.navigate('User', { user });
+  };
+
+  refreshList = () => {
+    this.setState({ refreshing: true, users: [] }, this.load);
   };
 
   /**
@@ -90,7 +117,7 @@ export default class Main extends Component {
    */
 
   render() {
-    const { users, newUser, loading } = this.state;
+    const { users, newUser, loading, refreshing } = this.state;
 
     return (
       <Container>
@@ -114,6 +141,8 @@ export default class Main extends Component {
         </Form>
 
         <List
+          onRefresh={this.refreshList} // Função dispara quando o usuário arrasta a lista pra baixo
+          refreshing={refreshing}
           data={users}
           keyExtractor={user => user.login}
           renderItem={({ item }) => (

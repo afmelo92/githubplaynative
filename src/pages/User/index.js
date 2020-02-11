@@ -17,6 +17,7 @@ import {
   Info,
   Title,
   Author,
+  RepoButton,
 } from './styles';
 
 export default class User extends Component {
@@ -64,6 +65,11 @@ export default class User extends Component {
     this.setState({ refreshing: true, stars: [] }, this.load);
   };
 
+  handleNavigate = repo => {
+    const { navigation } = this.props;
+    navigation.navigate('Details', { repo });
+  };
+
   render() {
     const { route } = this.props;
     const { stars, loading, refreshing } = this.state;
@@ -89,13 +95,15 @@ export default class User extends Component {
             data={stars}
             keyExtractor={star => String(star.id)}
             renderItem={({ item }) => (
-              <Starred>
-                <OwnerAvatar source={{ uri: item.owner.avatar_url }} />
-                <Info>
-                  <Title>{item.name}</Title>
-                  <Author>{item.owner.login}</Author>
-                </Info>
-              </Starred>
+              <RepoButton onPress={() => this.handleNavigate(item)}>
+                <Starred>
+                  <OwnerAvatar source={{ uri: item.owner.avatar_url }} />
+                  <Info>
+                    <Title>{item.name}</Title>
+                    <Author>{item.owner.login}</Author>
+                  </Info>
+                </Starred>
+              </RepoButton>
             )}
           />
         )}

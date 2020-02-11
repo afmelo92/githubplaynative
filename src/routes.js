@@ -32,7 +32,11 @@ export default function Routes() {
         // options={({ route }) => ({ title: route.params.name })}
         component={User}
       />
-      <Stack.Screen name="Details" component={Details} />
+      <Stack.Screen
+        name="Details"
+        options={({ route }) => ({ title: route.params.repo.name })}
+        component={Details}
+      />
     </Stack.Navigator>
   );
 }

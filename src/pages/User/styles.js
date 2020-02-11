@@ -52,9 +52,7 @@ export const Starred = styled.View`
   align-items: center;
 `;
 
-export const RepoButton = styled(RectButton)`
-  flex: 1;
-`;
+export const RepoButton = styled(RectButton)``;
 
 export const OwnerAvatar = styled.Image`
   height: 42px;

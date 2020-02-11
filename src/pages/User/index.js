@@ -112,6 +112,9 @@ export default class User extends Component {
   }
 }
 User.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func,
+  }).isRequired,
   route: PropTypes.shape({
     params: PropTypes.shape({
       user: PropTypes.shape({
